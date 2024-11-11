@@ -5,6 +5,8 @@
 /* ***********************
  * Require Statements
  *************************/
+
+const path = require('path'); // Import the path module
 const express = require("express")
 const expressLayouts = require("express-ejs-layouts")
 const env = require("dotenv").config()
@@ -30,6 +32,8 @@ app.get('/', (req, res) => {
   res.render('index', { title: 'My Custom Title' });
 });
 
+// Serve static files from the "public" directory
+app.use(express.static(path.join(__dirname, 'public')));
 
 /* ***********************
  * Local Server Information
