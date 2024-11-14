@@ -25,6 +25,11 @@ header {
   color: white;
 }
 
+header {
+  background-color: #333; /* Dark background with white text ensures contrast */
+  color: white;
+}
+
 header h1 {
   font-size: 1.5em;
   margin-left: 10px;
@@ -48,6 +53,12 @@ nav ul {
   justify-content: space-around;
   padding: 10px;
   margin: 0;
+}
+
+nav ul li a {
+  color: #0b5ea8; /* Darker blue for better contrast */
+  text-decoration: none;
+  padding: 10px 15px;
 }
 
 nav ul li a {
@@ -100,7 +111,7 @@ main {
 }
 
 .car-info button {
-  background-color: #1e90ff;
+  background-color: #0b5ea8;
   color: white;
   padding: 10px 20px;
   margin-top: 10px;
@@ -150,7 +161,7 @@ main {
 }
 
 .upgrades ul li a {
-  color: #1e90ff;
+  color: #0b5ea8;
   text-decoration: none;
 }
 
@@ -241,4 +252,8 @@ footer {
 *:before,
 *:after {
   box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+  /* Adjust layouts for larger screens */
 }
