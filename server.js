@@ -5,6 +5,8 @@ const env = require("dotenv").config();
 const app = express();
 const static = require("./routes/static");
 const baseController = require("./controllers/baseController");
+const inventoryRoute = require("./routes/inventoryroute"); 
+
 
 /* ******************************************
  * View Engine and Templates
@@ -20,6 +22,10 @@ app.use(static);
 
 // Root route
 app.get('/', baseController.buildHome);
+
+// Inventory routes
+app.use('/inv', inventoryRoute); 
+
 
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, 'public')));
