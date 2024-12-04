@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/public/css/styles.css"> <!-- Link to your CSS file (optional) -->
+</head>
+<body>
+  <div class="error-container">
+    <header>
+      <h1><%= title %></h1>
+    </header>
+    <main>
+      <p class="error-message"><%- message %></p> <!-- Display the error message -->
+      <div class="fun-message">
+        <p>Oops! Something went wrong.</p>
+        <p>We're already working on it (or at least pretending to)!</p>
+        <p><a href="/">Click here to go back home</a>. Or just stay and admire this page's design!</p>
+      </div>
+    </main>
+    <footer>
+      <p>Need help? Contact us or try refreshing the page. We promise it’s not always this broken.</p>
+    </footer>
+  </div>
+</body>
+</html>
