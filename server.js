@@ -6,8 +6,9 @@ const app = express();
 const static = require("./routes/static");
 const baseController = require("./controllers/basecontroller");
 const utilities = require("./utilities/"); // Ensure utilities is required
-console.log("Loading routes...");
+const errorMiddleware = require("./middleware/errorMiddleware"); // Import the error middleware
 const inventoryRoute = require('./routes/inventoryroute');
+const errorRoute = require('./routes/errorRoute'); // Import intentional error route
 
 /* ******************************************
  * View Engine and Templates
@@ -25,7 +26,10 @@ app.use(static);
 app.get('/', utilities.handleErrors(baseController.buildHome));
 
 // Inventory routes
-app.use('/inv', inventoryRoute); 
+app.use('/inv', inventoryRoute);
+
+// Intentional Error Route
+app.use('/error', errorRoute);
 
 // Serve static files from the "public" directory
 app.use(express.static(path.join(__dirname, 'public')));
@@ -39,28 +43,10 @@ app.use(async (req, res, next) => {
 });
 
 /* ***********************
- * Express Error Handler
+ * Express Error Handler Middleware
  * Place after all other middleware
  *************************/
-app.use(async (err, req, res, next) => {
-  let nav = await utilities.getNav(); // Get navigation for error page
-  console.error(`Error at: "${req.originalUrl}": ${err.message}`); // Log error details in console
-
-  // Generic error message for users
-  let message;
-  if (err.status == 404) {
-    message = err.message; // For 404, display the message (e.g., "Page not found")
-  } else {
-    message = 'Oh no! There was a crash. Maybe try a different route?'; // Generic error message for server errors
-  }
-
-  // Render the error page with a generic message and navigation
-  res.render("errors/error", {
-    title: err.status || 'Server Error',
-    message, // Display the generic error message
-    nav
-  });
-});
+app.use(errorMiddleware); // Apply error handling middleware
 
 /* ***********************
  * Local Server Information
