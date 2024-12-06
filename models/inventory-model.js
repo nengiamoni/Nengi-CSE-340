@@ -4,7 +4,7 @@ const pool = require("../database/")
  *  Get all classification data
  * ************************** */
 async function getClassifications(){
-  return await pool.query("SELECT * FROM public.classification ORDER BY classification_name")
+  return await pool.query("SELECT * FROM public.classification ORDER BY classification_name") /* bugging from public.classification ORDER BY classification_name */
 }
 
 /* ***************************
@@ -26,18 +26,90 @@ async function getInventoryByClassificationId(classification_id) {
 }
 
 /* ***************************
- *  Get specific vehicle by ID
+ *  Get Vechicle details by classification_id
  * ************************** */
-async function getVehicleById(inventoryId) {
+async function getVehicleById(id) {
   try {
-    const sql = `
-      SELECT * FROM public.inventory 
-      WHERE inv_id = $1`;
-    const data = await pool.query(sql, [inventoryId]);
-    return data.rows[0];
+    const result = await pool.query(
+      `SELECT 
+         inv_id, inv_make, inv_model, inv_year, inv_description, 
+         inv_image, inv_thumbnail, inv_price, inv_miles, inv_color,
+         classification.classification_name
+       FROM inventory 
+       INNER JOIN classification 
+       ON inventory.classification_id = classification.classification_id
+       WHERE inv_id = $1`, 
+      [id]
+    )
+    return result.rows[0] // Get single row result (car details)
   } catch (error) {
-    console.error("Error fetching vehicle by ID: ", error);
+    console.error('Error getting vehicle by ID:', error)
+    throw error
   }
 }
 
-module.exports = { getClassifications, getInventoryByClassificationId, getVehicleById };
+/* ***************************
+ *  Add new classification by name 
+ * ************************** */
+async function addClassification(classification_name) {
+  if (!classification_name) {
+    throw new Error("Classification name is required");
+  }
+
+  try {
+    const sql =
+      "INSERT INTO classification (classification_name) VALUES ($1) RETURNING *";
+    return await pool.query(sql, [classification_name]);
+  } catch (error) {
+    console.error("Add Classification error:", error.message);
+    throw error;
+  }
+}
+
+/* ***************************
+ *  Post new classification element in the server
+ * ************************** */
+async function addNewClassification(classification_name) {
+  try {
+    const sql = "INSERT INTO classification (classification_name) VALUES ($1) RETURNING *"
+    return await pool.query(sql, [classification_name])
+  } catch (error) {
+    console.error("Add New Classification error " + error.message)
+  }
+}
+
+/* ***************************
+ *  check exiting classification
+ * ************************** */
+function capitalize(str) { 
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase(); 
+}  
+
+async function checkExistingClassification(classification_name) { 
+  try {
+    const sql = "SELECT * FROM classification WHERE classification_name = $1"
+    const classification1 = await pool.query(sql, [classification_name.toLowerCase()])
+    const classification2 = await pool.query(sql, [classification_name.toUpperCase()])
+    const classification3 = await pool.query(sql, [capitalize(classification_name)])
+    return classification1.rowCount + classification2.rowCount + classification3.rowCount
+  } catch (error) { 
+    console.error("Exiting Clasification error " + error.message);
+  } 
+}
+
+/* ***************************
+ *  Add new inventory (Vechicle)
+ * ************************** */
+async function addNewInventory(classification_id, inv_make, inv_model, inv_description, inv_image, 
+  inv_thumbnail, inv_price, inv_year,  inv_miles, inv_color) {
+  try {
+    const sql = "INSERT INTO inventory (classification_id, inv_make, inv_model, inv_description, inv_image, inv_thumbnail, inv_price, inv_year,  inv_miles, inv_color) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *"
+    return await pool.query(sql, [classification_id, inv_make, inv_model, inv_description, inv_image, 
+      inv_thumbnail, inv_price, inv_year, inv_miles, inv_color])
+  } catch (error) {
+    console.error("Add Now Vechicle error " + error.message)
+  }
+}
+
+module.exports = {getClassifications, getInventoryByClassificationId, getVehicleById, addClassification, 
+  checkExistingClassification, addNewClassification, addNewInventory};

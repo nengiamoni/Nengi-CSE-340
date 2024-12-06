@@ -7,47 +7,52 @@ const invCont = {}
  *  Build inventory by classification view
  * ************************** */
 invCont.buildByClassificationId = async function (req, res, next) {
-  const classification_id = req.params.classificationId
-  const data = await invModel.getInventoryByClassificationId(classification_id)
-  const grid = await utilities.buildClassificationGrid(data)
-  let nav = await utilities.getNav()
-  const className = data[0].classification_name
-  res.render("./inventory/classification", {
-    title: className + " vehicles",
-    nav,
-    grid,
-  })
+  try {
+    const classification_id = req.params.classificationId
+    const data = await invModel.getInventoryByClassificationId(classification_id)
+    if (!data || data.length === 0) {
+      throw new Error("Classification not found")
+    }
+    const grid = await utilities.buildClassificationGrid(data)
+    const nav = await utilities.getNav()
+    const className = data[0].classification_name
+    //req.flash("notice", "This is flash message!") // 
+    res.render("./inventory/classification", {
+      title: className + " vehicles",
+      nav,
+      grid,
+    })
+  } catch (err) {
+    next(err) // send to error handler
+  }
 }
 
 /* ***************************
- *  Build vehicle detail view
+ *  Build vehicle details view
  * ************************** */
-invCont.buildVehicleDetail = async function (req, res, next) {
-  const inventoryId = req.params.inventoryId;
-
+invCont.buildByVehicleId = async function (req, res, next) {
   try {
-    // Fetch vehicle data
-    const vehicleData = await invModel.getVehicleById(inventoryId);
+    const vehicle_id = req.params.vehicleId
+    const vehicleData = await invModel.getVehicleById(vehicle_id)
 
+     // check vehicleData 
     if (!vehicleData) {
-      res.status(404).send("Vehicle not found");
-      return;
+    const err = new Error("Vehicle not found")
+    err.status = 404
+    return next(err)  // send to error handler
     }
-
-    // Build the HTML for vehicle detail
-    const vehicleHtml = await utilities.buildVehicleDetailHtml(vehicleData);
-    const nav = await utilities.getNav();
-
-    // Render the detail view
-    res.render("./inventory/vehicle-detail", {
-      title: `${vehicleData.inv_make} ${vehicleData.inv_model}`,
+    
+    const nav = await utilities.getNav()
+    const details = utilities.buildVehicleDetails(vehicleData)
+    //req.flash("notice", "This is flash message!") // 
+    res.render("./inventory/vehicle-details", {
+      title: `${vehicleData.inv_year || "Unknown Year"} ${vehicleData.inv_make} ${vehicleData.inv_model}`,
       nav,
-      vehicleHtml,
-    });
-  } catch (error) {
-    console.error("Error building vehicle detail view: ", error);
-    next(error);
+      details, // send to HTML
+    })
+  } catch (err) {
+    next(err) // // send to error handler
   }
-};
+}
 
-module.exports = invCont;
+module.exports = invCont

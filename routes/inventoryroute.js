@@ -1,9 +1,13 @@
-const express = require('express');  // Import express
-const router = express.Router();     // Define the router
-const invController = require('../controllers/invController'); // Import your controller
+const express = require("express")
+const router = new express.Router() 
+const invController = require("../controllers/invController")
+const utilities = require("../utilities/index.js");
 
-// Define routes
-router.get("/type/:classificationId", invController.buildByClassificationId);
+// Route to build inventory by classification view
+router.get("/type/:classificationId", utilities.handleErrors(invController.buildByClassificationId));
+
+// Route to display vehicle details by ID
+router.get("/detail/:vehicleId", utilities.handleErrors(invController.buildByVehicleId));
 
 // Export the router so it can be used in server.js
 module.exports = router;

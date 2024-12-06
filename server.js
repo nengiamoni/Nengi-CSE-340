@@ -13,6 +13,7 @@ const errorRoute = require('./routes/errorRoute'); // Import intentional error r
 /* ******************************************
  * View Engine and Templates
  ****************************************** */
+app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 app.use(expressLayouts);
 app.set("layout", "./layouts/layout"); // not at views root
