@@ -26,38 +26,36 @@ invCont.buildByClassificationId = async function (req, res, next) {
     next(err) // send to error handler
   }
 }
+
 /* ***************************
  *  Build vehicle details view
  * ************************** */
 invCont.buildByVehicleId = async function (req, res, next) {
   try {
-    const vehicle_id = req.params.vehicleId;
-    const vehicleData = await invModel.getVehicleById(vehicle_id);
+    const vehicle_id = req.params.vehicleId
+    const vehicleData = await invModel.getVehicleById(vehicle_id)
 
-    // check vehicleData 
+     // check vehicleData 
     if (!vehicleData) {
-      const err = new Error("Vehicle not found");
-      err.status = 404;
-      return next(err); // send to error handler
+    const err = new Error("Vehicle not found")
+    err.status = 404
+    return next(err)  // send to error handler
     }
-
-    const nav = await utilities.getNav();
-    const details = utilities.buildVehicleDetails(vehicleData);
-
-    res.render("./inventory/vehicle-details", {
+    
+    const nav = await utilities.getNav()
+    const details = utilities.buildVehicleDetails(vehicleData)
+    //req.flash("notice", "This is flash message!") // 
+    res.render("./inventory/vehicle-detail", {
       title: `${vehicleData.inv_year || "Unknown Year"} ${vehicleData.inv_make} ${vehicleData.inv_model}`,
       nav,
-      details,
-      errors: null, // Added to resolve the issue
-    });
+      details, // send to HTML
+    })
   } catch (err) {
-    next(err); // send to error handler
+    next(err) // // send to error handler
   }
-};
-
+}
 
 /* ***************************
- * Week 04 : activity
  *  Build Inventory Management View
  * ************************** */
 invCont.renderManagementView = async function (req, res, next) {
@@ -110,7 +108,7 @@ invCont.addNewClassification = async function (req, res, next) {
   } else {
     req.flash(
       "notice", 
-      "Sorry! the classification was not added."
+      "Sorry! classification was not added."
     )
     res.status(501).render("./inventory/add-classification", {
       title: "Add New Classification", 
@@ -173,7 +171,7 @@ invCont.addNewInventory = async function (req, res, next) {
     res.status(501).render("./inventory/add-inventory", {
       title: "Add Inventory", 
       nav,
-      typeSelector, // Pass the typeSelector variable to the view.
+      typeSelector, 
       errors: null,     
     })
   }
