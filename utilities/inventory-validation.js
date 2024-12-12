@@ -4,25 +4,25 @@ const { body, validationResult } = require("express-validator")
 const validate = {}
 
 /*  **********************************
-*  Add Classification Rule
+*  Validation rules for adding classification
 * ********************************* */
 validate.addClassificationRules = () => {
     return [
         body("classification_name")
             .isAlpha()
-            .withMessage("Please provide a valid name.") // on error this message is sent.
+            .withMessage("Please provide a valid name.") // Error message if input is not a valid string
             .notEmpty()
             .custom(async (classification_name) => {
                 const classExists = await inventoryModel.checkExistingClassification(classification_name)
                 if (classExists){
-                  throw new Error("Classification already exists. Please enter a new classification.")
+                  throw new Error("Classification already exists. Please enter a new classification.") // Error if classification name already exists
                 }
               }),
         ]
 }
 
 /*  **********************************
-*  Check Classification Data 
+*  Middleware to check classification data
 * ********************************* */
 validate.checkClassificationData = async (req, res, next) => {
     let errors = []
@@ -43,53 +43,52 @@ validate.checkClassificationData = async (req, res, next) => {
 }
 
 /*  **********************************
-*  Add Inventory  Rules
+*  Validation rules for adding inventory
 * ********************************* */
 validate.addInventoryRules = () => {
     return [
        body("classification_id")
             .isInt()
             .notEmpty()
-            .withMessage("Please Choose a Classification List."), 
+            .withMessage("Please Choose a Classification List."), // Error if classification is not selected
 
         body("inv_make")
             .notEmpty()
-            .withMessage("Please provide a Make."),
+            .withMessage("Please provide a Make."), // Error if make is missing
             
         body("inv_model")
             .notEmpty()
-            .withMessage("Please provide a Model."),
+            .withMessage("Please provide a Model."), // Error if model is missing
 
         body("inv_description")
             .notEmpty()
-            .withMessage("Please provide Description."),
+            .withMessage("Please provide Description."), // Error if description is missing
 
         body("inv_image")
-            .notEmpty(),
+            .notEmpty(), // Error if image is not provided
 
         body("inv_thumbnail")
-            .notEmpty(),    
+            .notEmpty(), // Error if thumbnail is missing    
             
         body("inv_year")
             .isInt()
             .notEmpty()
-            .withMessage("Please provide Year."),
+            .withMessage("Please provide Year."), // Error if year is not a number
         
         body("inv_miles")
             .isInt()
             .notEmpty()
-            .withMessage("Please provide Miles."),
+            .withMessage("Please provide Miles."), // Error if miles is not a number
 
         body("inv_color")
             .isAlpha()
             .notEmpty()
-            .withMessage("Please provide a Color.")
-        
+            .withMessage("Please provide a Color.") // Error if color is not valid
     ]
 }
 
 /* ******************************
- * Check add inventory data
+ * Middleware to validate inventory data
  * ***************************** */
 validate.checkInventoryData = async (req, res, next) => {
 

@@ -1,9 +1,10 @@
 /* ******************************************
- * This server.js file is the primary file of the 
- * application. It is used to control the project.
+ * The server.js file acts as the main entry 
+ * point of the application, managing the 
+ * project’s server-side functionality.
  *******************************************/
 /* ***********************
- * Require Statements
+ * Importing Required Modules
  *************************/
 const expressLayouts = require("express-ejs-layouts");
 const express = require("express");
@@ -11,7 +12,7 @@ const env = require("dotenv").config();
 const app = express();
 const static = require("./routes/static");
 const baseController = require("./controllers/basecontroller");
-const inventoryRoute = require("./routes/inventoryroute"); // Import the route
+const inventoryRoute = require("./routes/inventoryroute"); // Adding inventory route
 const utilities = require("./utilities/");
 const session = require("express-session");
 const pool = require("./database/");
@@ -21,9 +22,9 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 
 /* ***********************
- * Middleware
+ * Setting Up Middleware
  ************************/
-const sessionSecret = process.env.SESSION_SECRET || 'default-secret'; // Use default for development
+const sessionSecret = process.env.SESSION_SECRET || 'default-secret'; // Default secret in development mode
 app.use(
   session({
     store: new (require("connect-pg-simple")(session))({
@@ -35,81 +36,81 @@ app.use(
     saveUninitialized: false,
     name: "sessionId",
     cookie: {
-      secure: process.env.NODE_ENV === "production", // Secure cookies in production
+      secure: process.env.NODE_ENV === "production", // Enable secure cookies for production
       httpOnly: true,
-      maxAge: 1000 * 60 * 60 * 24, // 1 day
+      maxAge: 1000 * 60 * 60 * 24, // Set cookie expiration to 1 day
     },
   })
 );
 
-// Log the session secret to ensure it's loaded (development only)
+// Log session secret during development to ensure it is correctly loaded
 if (process.env.NODE_ENV !== "production") {
   console.log("SESSION_SECRET:", sessionSecret);
 }
 
-// Express Messages Middleware
+// Enabling Express Messages Middleware
 app.use(require("connect-flash")());
 app.use(function (req, res, next) {
   res.locals.messages = require("express-messages")(req, res);
   next();
 });
 
-// Activity of Account: Process Registration
+// Account Registration Handler
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: true })); // Allows parsing of x-www-form-urlencoded data
 
-// Week05 Login activity
+// Handling Cookies (Week05 feature)
 app.use(cookieParser());
 
-// Week05 cookie activity
+// JWT Token Validation Middleware (Week05 feature)
 app.use(utilities.checkJWTToken);
 
 /* ***********************
- * View Engine and Templates
+ * Template Engine Configuration
  *************************/
 app.set("view engine", "ejs");
 app.use(expressLayouts);
-app.set("layout", "./layouts/layout"); // not at views root
+app.set("layout", "./layouts/layout"); // Specifies a custom layout for the views
 
 /* ***********************
- * Routes
+ * Defining Routes
  *************************/
 app.use(require("./routes/static"));
 
-// Index route
+// Main Index Route
 app.get("/", utilities.handleErrors(baseController.buildHome));
 
-// Inventory routes
+// Inventory Route Definitions
 app.use("/inv", inventoryRoute);
 
-// Account routes from Week04: Activity
+// Account-related Routes
 app.use("/account", accountRoute);
 
-// Add a route that will cause an error
+// Route to trigger an error for testing purposes
 app.get("/trigger-error", utilities.handleErrors(baseController.triggerError));
 
-// File Not Found Route - must be last route in list
+// Custom 404 Error Route (must be the last route)
 app.use(async (req, res, next) => {
-  next({ status: 404, message: "Sorry, we appear to have lost that page." });
+  next({ status: 404, message: "Sorry, we couldn’t find that page." });
 });
 
 /* ***********************
- * Express Error Handler
- * Place after all other middleware
+ * Global Error Handling Middleware
+ * Should be placed after all other routes
  *************************/
 app.use(async (err, req, res, next) => {
   let nav = await utilities.getNav();
-  console.error(`Error at: "${req.originalUrl}": ${err.message}`);
+  console.error(`Error occurred at: "${req.originalUrl}": ${err.message}`);
 
-  // Set error message
+  // Error message based on status
   let message;
   if (err.status == 404) {
     message = err.message;
   } else {
-    message = "Oh no! There was a crash. Maybe try a different route?";
+    message = "Oops! Something went wrong. You might want to try a different path.";
   }
 
-  // Sending error data to view
+  // Send error details to the view
   res.render("errors/error", {
     title: err.status || "Server Error",
     message,
@@ -118,15 +119,15 @@ app.use(async (err, req, res, next) => {
 });
 
 /* ***********************
- * Local Server Information
- * Values from .env (environment) file
+ * Server Configuration
+ * Values loaded from the .env file
  *************************/
 const port = process.env.PORT;
 const host = process.env.HOST;
 
 /* ***********************
- * Log statement to confirm server operation
+ * Starting the Express Server
  *************************/
 app.listen(port, () => {
-  console.log(`app listening on ${host}:${port}`);
+  console.log(`Server is running on ${host}:${port}`);
 });

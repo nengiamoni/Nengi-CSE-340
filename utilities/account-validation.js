@@ -5,44 +5,43 @@ const accountModel = require("../models/account-model")
 const bcrypt = require('bcryptjs');
 
 
-/*  **********************************
-  *  Registration Data Validation Rules
-  * ********************************* */
+/* **************************************
+  *  Validation Rules for Registration
+  * ************************************ */
 validate.registationRules = () => {
     return [
-      // firstname is required and must be string
+      // Ensure first name is provided and is a valid string
       body("account_firstname")
         .trim()
         .escape()
         .notEmpty()
         .isLength({ min: 1 })
-        .withMessage("Please provide a first name."), // on error this message is sent.
+        .withMessage("First name is required."), // Error message if validation fails.
   
-      // lastname is required and must be string
+      // Ensure last name is provided and is a valid string
       body("account_lastname")
         .trim()
         .escape()
         .notEmpty()
         .isLength({ min: 2 })
-        .withMessage("Please provide a last name."), // on error this message is sent.
+        .withMessage("Last name is required."), // Error message if validation fails.
         
-
-      // valid email is required and cannot already exist in the DB
+      // Ensure the email is valid and not already in use
       body("account_email")
       .trim()
       .escape()
       .notEmpty()
       .isEmail()
-      .normalizeEmail() // refer to validator.js docs
-      .withMessage("A valid email is required.")
+      .normalizeEmail() // Normalize email according to validator.js
+      .withMessage("Please provide a valid email.")
       .custom(async (account_email) => {
         const emailExists = await accountModel.checkExistingEmail(account_email)
         if (emailExists){
-          throw new Error("Email exists. Please log in or use different email")
+          throw new Error("Email already exists. Please log in or use another email.")
         }
       }),
   
-      // password is required and must be strong password
+      // Ensure the password is strong and meets requirements
       body("account_password")
         .trim()
         .notEmpty()
@@ -53,13 +52,13 @@ validate.registationRules = () => {
           minNumbers: 1,
           minSymbols: 1,
         })
-        .withMessage("Password does not meet requirements."),
+        .withMessage("Password does not meet the required strength."),
     ]
   }
 
-  /* ******************************
- * Check data and return errors or continue to registration
- * ***************************** */
+  /* ***************************************
+  *  Validate Registration Data and Handle Errors
+  * ************************************** */
 validate.checkRegData = async (req, res, next) => {
     const { account_firstname, account_lastname, account_email } = req.body
     let errors = []
@@ -68,7 +67,7 @@ validate.checkRegData = async (req, res, next) => {
       let nav = await utilities.getNav()
       res.render("account/register", {
         errors,
-        title: "Registration",
+        title: "Register",
         nav,
         account_firstname,
         account_lastname,
@@ -80,50 +79,29 @@ validate.checkRegData = async (req, res, next) => {
   }
 
 
-/*  **********************************
-  *  login Data Validation Rules
-  * ********************************* */
+/* **************************************
+  *  Validation Rules for Login
+  * ************************************ */
 validate.loginRules = () => {
     return [
-      // Email must have in DB
+      // Ensure the email exists in the database
       body("account_email")
         .trim()
         .escape()
         .notEmpty()
         .isEmail()
-        .normalizeEmail() // use validator.js for normalize email
+        .normalizeEmail() // Normalize email according to validator.js
         .withMessage("A valid email is required.")
         .custom(async (account_email) => {
       
           const emailExists = await accountModel.checkExistingEmail(account_email);
           if (!emailExists) {
-            throw new Error("Email does not exist. Please register.");
+            throw new Error("Email not found. Please sign up.");
           }
         }),
   
-      // Password must match the information in the database.
-     /* body("account_password")
-        .trim()
-        .notEmpty()
-        .withMessage("Password is required.")
-        .custom(async (account_password, { req }) => {
-          const account_email = req.body.account_email; // Retrieve email that filled in form
-          const account = await accountModel.getAccountByEmail(account_email); // Retrieve account information from DB
-          if (!account) {
-            throw new Error("Invalid email or password."); // in case no email in DB
-          }
-  
-          //validate password by bcrypt
-         const isMatch = await bcrypt.compare(account_password, account.account_password);
-          if (!isMatch) {
-            throw new Error("Invalid email or password."); // password not match in DB
-          }
-        }),
-    ]
-  } */
-
-        // password is required and must be strong password
-        body("account_password")
+      // Ensure the password meets strength requirements
+      body("account_password")
         .trim()
         .notEmpty()
         .isStrongPassword({
@@ -133,14 +111,13 @@ validate.loginRules = () => {
           minNumbers: 1,
           minSymbols: 1,
         })
-        .withMessage("Password does not meet requirements."),
+        .withMessage("Password does not meet security requirements."),
     ]
-    }
+  }
 
-
-    /* ******************************
- * Check data and return errors or continue to login
- * ***************************** */
+    /* ***************************************
+ *  Validate Login Data and Handle Errors
+ * ************************************** */
     validate.checkLoginData = async (req, res, next) => {
       const { account_email } = req.body
       let errors = []
@@ -149,7 +126,7 @@ validate.loginRules = () => {
         let nav = await utilities.getNav()
         res.render("account/login", {
           errors,
-          title: "login",
+          title: "Login",
           nav,
           account_email,
         })

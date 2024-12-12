@@ -25,7 +25,7 @@ body, html {
   overflow-x: hidden;
 }
 
-#warpper {
+#wrapper {
   background-image: url("/images/site/small_check.jpg");
   width: 100vw;
   min-height: 100vh;
@@ -784,4 +784,3 @@ picture img {
     text-align: center;
   }
 }
-

@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken")
 require("dotenv").config()
 
 /* ************************
- * Constructs the nav HTML unordered list
+ * Generate the HTML for the navigation menu
  ************************** */
 Util.getNav = async function (req, res, next) {
   try {
@@ -35,7 +35,7 @@ Util.getNav = async function (req, res, next) {
 }
 
 /* **************************************
- * Build the classification view HTML
+ * Creates the HTML grid for displaying vehicles in a classification
  ************************************** */
 Util.buildClassificationGrid = async function (data) {
   try {
@@ -92,7 +92,7 @@ Util.buildClassificationGrid = async function (data) {
 
 
 /* ****************************************
- * Build the vehicle details view HTML
+ * Generate the vehicle detail page HTML
  **************************************** */
 Util.buildVehicleDetails = function (vehicle) {
   try {
@@ -138,7 +138,7 @@ Util.buildVehicleDetails = function (vehicle) {
 }
 
 /* **************************************
-* Build the selection for the add inventory view
+* Generates a dropdown for selecting a classification
 * ************************************ */
 Util.chooseClassification = async function (classification_id = null) {
   let data = await invModel.getClassifications()
@@ -160,15 +160,13 @@ Util.chooseClassification = async function (classification_id = null) {
 }
 
 /* ****************************************
- * Middleware For Handling Errors
- * Wrap other function in this for 
- * General Error Handling
+ * General error handling middleware
  **************************************** */
 Util.handleErrors = (fn) => (req, res, next) =>
   Promise.resolve(fn(req, res, next)).catch(next)
 
 /* ****************************************
-* Middleware to check token validity
+* Middleware to verify JWT token validity
 **************************************** */
 Util.checkJWTToken = (req, res, next) => {
   if (req.cookies.jwt) {
@@ -191,8 +189,8 @@ Util.checkJWTToken = (req, res, next) => {
  }
 
 /* ****************************************
- *  Check Login
- * ************************************ */
+ * Middleware to ensure the user is logged in
+ **************************************** */
 Util.checkLogin = (req, res, next) => {
   if (res.locals.loggedin) {
     next()
@@ -202,7 +200,5 @@ Util.checkLogin = (req, res, next) => {
   }
  }
 
-
 module.exports = Util
 
-//line 131: the mileage is formatted correctly with commas for thousands separators

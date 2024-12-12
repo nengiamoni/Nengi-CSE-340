@@ -1,14 +1,14 @@
 const pool = require("../database/")
 
 /* ***************************
- *  Get all classification data
+ *  Fetch all classifications
  * ************************** */
 async function getClassifications(){
-  return await pool.query("SELECT * FROM public.classification ORDER BY classification_name") /* bugging from public.classification ORDER BY classification_name */
+  return await pool.query("SELECT * FROM public.classification ORDER BY classification_name") /* Ensures data is sorted alphabetically by classification name */
 }
 
 /* ***************************
- *  Get all inventory items and classification_name by classification_id
+ *  Retrieve inventory by classification ID
  * ************************** */
 async function getInventoryByClassificationId(classification_id) {
   try {
@@ -21,12 +21,12 @@ async function getInventoryByClassificationId(classification_id) {
     )
     return data.rows
   } catch (error) {
-    console.error("getclassificationsbyid error " + error)
+    console.error("Error fetching inventory by classification ID: " + error)
   }
 }
 
 /* ***************************
- *  Get Vechicle details by classification_id
+ *  Fetch vehicle details by ID
  * ************************** */
 async function getVehicleById(id) {
   try {
@@ -41,19 +41,19 @@ async function getVehicleById(id) {
        WHERE inv_id = $1`, 
       [id]
     )
-    return result.rows[0] // Get single row result (car details)
+    return result.rows[0] // Returns a single vehicle's details
   } catch (error) {
-    console.error('Error getting vehicle by ID:', error)
+    console.error('Error retrieving vehicle by ID:', error)
     throw error
   }
 }
 
 /* ***************************
- *  Add new classification by name 
+ *  Insert a new classification
  * ************************** */
 async function addClassification(classification_name) {
   if (!classification_name) {
-    throw new Error("Classification name is required");
+    throw new Error("Classification name cannot be empty");
   }
 
   try {
@@ -61,25 +61,25 @@ async function addClassification(classification_name) {
       "INSERT INTO classification (classification_name) VALUES ($1) RETURNING *";
     return await pool.query(sql, [classification_name]);
   } catch (error) {
-    console.error("Add Classification error:", error.message);
+    console.error("Error adding classification:", error.message);
     throw error;
   }
 }
 
 /* ***************************
- *  Post new classification element in the server
+ *  Add classification to database
  * ************************** */
 async function addNewClassification(classification_name) {
   try {
     const sql = "INSERT INTO classification (classification_name) VALUES ($1) RETURNING *"
     return await pool.query(sql, [classification_name])
   } catch (error) {
-    console.error("Add New Classification error " + error.message)
+    console.error("Error while adding new classification: " + error.message)
   }
 }
 
 /* ***************************
- *  check exiting classification
+ *  Check if classification exists
  * ************************** */
 function capitalize(str) { 
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase(); 
@@ -93,12 +93,12 @@ async function checkExistingClassification(classification_name) {
     const classification3 = await pool.query(sql, [capitalize(classification_name)])
     return classification1.rowCount + classification2.rowCount + classification3.rowCount
   } catch (error) { 
-    console.error("Exiting Clasification error " + error.message);
+    console.error("Error checking classification existence: " + error.message);
   } 
 }
 
 /* ***************************
- *  Add new inventory (Vechicle)
+ *  Insert a new vehicle (inventory item)
  * ************************** */
 async function addNewInventory(classification_id, inv_make, inv_model, inv_description, inv_image, 
   inv_thumbnail, inv_price, inv_year,  inv_miles, inv_color) {
@@ -107,7 +107,7 @@ async function addNewInventory(classification_id, inv_make, inv_model, inv_descr
     return await pool.query(sql, [classification_id, inv_make, inv_model, inv_description, inv_image, 
       inv_thumbnail, inv_price, inv_year, inv_miles, inv_color])
   } catch (error) {
-    console.error("Add Now Vechicle error " + error.message)
+    console.error("Error adding new vehicle: " + error.message)
   }
 }
 

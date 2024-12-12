@@ -1,7 +1,7 @@
 const pool = require("../database/")
 
 /* *****************************
-*   Register new account
+*   Create a new user account
 * *************************** */
 async function registerAccount(account_firstname, account_lastname, account_email, account_password){
   try {
@@ -13,7 +13,7 @@ async function registerAccount(account_firstname, account_lastname, account_emai
 }
 
 /* **********************
- *   Check for existing email
+ *   Verify if email exists
  * ********************* */
 async function checkExistingEmail(account_email){
   try {
@@ -26,7 +26,7 @@ async function checkExistingEmail(account_email){
 }
 
 /* **********************
- *   Check for account information from DB
+ *   Retrieve account info by email
  * ********************* */
 async function getAccountByEmail(account_email) {
   try {
@@ -39,10 +39,11 @@ async function getAccountByEmail(account_email) {
 }
 
 /* *****************************
-*   Account Login 
+*   Authenticate account login
 * *************************** */
 async function loginAccount(account_email, account_password) {
-  try {const sql = "SELECT * FROM account WHERE account_email = $1"; 
+  try {
+    const sql = "SELECT * FROM account WHERE account_email = $1"; 
     const result = await pool.query(sql, [account_email]); 
     if (result.rows.length > 0) { 
       const user = result.rows[0];
@@ -52,15 +53,15 @@ async function loginAccount(account_email, account_password) {
       } else { 
         return false;
       } 
-      }
-    } catch (error) { 
-      console.log(error)
-      return error.message; 
-    } 
-  }
+    }
+  } catch (error) { 
+    console.log(error)
+    return error.message; 
+  } 
+}
 
 /* *****************************
-* Return account data using email address
+* Fetch account details using email
 * ***************************** */
 async function getAccountByEmail (account_email) {
   try {
@@ -72,6 +73,5 @@ async function getAccountByEmail (account_email) {
     return new Error("No matching email found")
   }
 }
-
 
 module.exports = {registerAccount, checkExistingEmail, getAccountByEmail, loginAccount};
