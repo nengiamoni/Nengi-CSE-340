@@ -51,6 +51,7 @@ if (process.env.NODE_ENV !== "production") {
 // Enabling Express Messages Middleware
 app.use(require("connect-flash")());
 app.use(function (req, res, next) {
+  res.locals.user = req.session.user || null;
   res.locals.messages = require("express-messages")(req, res);
   next();
 });
@@ -122,7 +123,7 @@ app.use(async (err, req, res, next) => {
  * Server Configuration
  * Values loaded from the .env file
  *************************/
-const port = process.env.PORT;
+const port = process.env.PORT || 3000;
 const host = process.env.HOST;
 
 /* ***********************
@@ -130,4 +131,5 @@ const host = process.env.HOST;
  *************************/
 app.listen(port, () => {
   console.log(`Server is running on ${host}:${port}`);
+
 });

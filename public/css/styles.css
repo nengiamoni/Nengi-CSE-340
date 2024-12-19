@@ -37,8 +37,8 @@ body, html {
 }
 
 /* Inner Frame with White Background and Border */
-.inner-frame {
-  background-color: white;
+#inner-frame {
+  background-color: white !important;
   border: 5px solid var(--primary-color);
   padding: 20px;
   width: 100%;
@@ -63,6 +63,11 @@ body, html {
   color: var(--primary-color);
   text-decoration: none;
   
+}
+
+#account-name{
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 #tools a {
